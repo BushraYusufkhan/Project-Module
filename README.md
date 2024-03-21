@@ -51,6 +51,18 @@ Running mitohifi on the contigs data
 ```
  docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -c /home/bkhan/Data/Tripylella_sp/assembly.fasta -f /home/bkhan/Data/Tripylella_sp/NC_056391.1.fasta -g /home/bkhan/Data/Tripylella_sp/NC_056391.1.gb -t 12 -o 5 --mitos
 ```
+# Acrobeloides nanus
+Search and Download reference Mitogenome
+```
+ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Acrobeloides nanus" --outfolder /home/bkhan/Data/Acrobeloides_nanus --min_length 12000
+```
+Running mitohifi on the contigs data
+```
+docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -c /home/bkhan/Data/Acrobeloides_nanus/ananus.flye_v29_default.fasta -f /home/bkhan/Data/Acrobeloides_nanus/MK559448.1.fasta -g /home/bkhan/Data/Acrobeloides_nanus/MK559448.1.gb -t 12 -o 5
+```
+
+
+
 
 
 
