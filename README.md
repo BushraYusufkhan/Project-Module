@@ -81,6 +81,23 @@ Running mitohifi on the reads
 ```
 docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Acrobeloides_buchneri/m54274Ue_230501_185711.hifi_reads.fastq.gz -f /home/bkhan/Data/Acrobeloides_buchneri/MK559448.1.fasta -g /home/bkhan/Data/Acrobeloides_buchneri/MK559448.1.gb -t 12 -o 5
 ```
+## Could not find mitochondrial genomes
+###  Anaplectus_granulosus
+Command to find and download the reference mitogenome
+```
+docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Anaplectus granulosus" --outfolder /home/bkhan/Data/Anaplectus_granulosus --min_length 12000
+```
+Running mitohifi on the reads
+```
+ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Anaplectus_granulosus/m54274Ue_230530_134758.hifi_reads.fa -f  /home/bkhan/Data/Anaplectus_granulosu
+s/KX017524.1.fasta -g /home/bkhan/Data/Anaplectus_granulosus/KX017524.1.gb -t 12 -o 5
+```
+Running mitohifi on the contigs data
+```
+docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Anaplectus_granulosus/agranulosus.flye_v29_default.fasta -f  /home/bkhan/Data/Anaplectus_granulosus/
+KX017524.1.fasta -g /home/bkhan/Data/Anaplectus_granulosus/KX017524.1.gb -t 12 -o 5
+```
+### Mononchus_laminatus
 
 
 
