@@ -44,7 +44,7 @@ So, I used a different reference and it worked. But this reference was not that 
 erea/NC_009885.1.fasta -g /home/bkhan/Data/Diploscapter_oocerea/NC_009885.1.gb -t 12 -o 5
 ```
 ### Tripylella_sp
-Command to search and download the reference mitogenome
+Command to search and download reference mitogenome
 ```
  docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Tripylella" --outfolder /home/bkhan/Data/Tripylella_sp --min_length 12000
 ```
