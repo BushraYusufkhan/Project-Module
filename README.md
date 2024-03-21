@@ -94,10 +94,19 @@ s/KX017524.1.fasta -g /home/bkhan/Data/Anaplectus_granulosus/KX017524.1.gb -t 12
 ```
 Running mitohifi on the contigs data
 ```
-docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Anaplectus_granulosus/agranulosus.flye_v29_default.fasta -f  /home/bkhan/Data/Anaplectus_granulosus/
+docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -c /home/bkhan/Data/Anaplectus_granulosus/agranulosus.flye_v29_default.fasta -f  /home/bkhan/Data/Anaplectus_granulosus/
 KX017524.1.fasta -g /home/bkhan/Data/Anaplectus_granulosus/KX017524.1.gb -t 12 -o 5
 ```
 ### Mononchus_laminatus
+Running mitohifi on the reads
+```
+ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Mononchus_laminatus/m64093_230811_043738.hifi_reads.fastq.gz -f /home/bkhan/Data/Mononchus_laminatus/NC_056391.1.fasta -g /home/bkhan/Data/Mononchus_laminatus/NC_056391.1.gb -t 12 -o 5
+```
+Running mitohifi on the contigs data
+```
+docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -c /home/bkhan/Data/Mononchus_laminatus/mlaminatus.flye_v29_default.fasta -f /home/bkhan/Data/Mononchus_laminatus/NC_05639
+1.1.fasta -g /home/bkhan/Data/Mononchus_laminatus/NC_056391.1.gb -t 12 -o 5
+```
 
 
 
