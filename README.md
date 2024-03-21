@@ -52,6 +52,7 @@ Running mitohifi on the contigs data
 ```
  docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -c /home/bkhan/Data/Tripylella_sp/assembly.fasta -f /home/bkhan/Data/Tripylella_sp/NC_056391.1.fasta -g /home/bkhan/Data/Tripylella_sp/NC_056391.1.gb -t 12 -o 5 --mitos
 ```
+
 ## linear mitochondrial genomes
 ### Acrobeloides nanus
 Search and Download reference Mitogenome
