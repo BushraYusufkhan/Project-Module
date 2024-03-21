@@ -73,8 +73,8 @@ Running mitohifi on the reads
 docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Acrobeloides_PAP2217/m54274Ue_230602_080202.hifi_reads.fastq.gz -f /home/bkhan/Data/Acrobeloides_PAP2217/MK559448.1.fasta -g /home/bkhan/Data/Acrobeloides_PAP2217/MK559448.1.gb -t 12 -o 5
 ```
 ### Acrobeloides_buchneri
-```
 Search and download the reference mitogenome
+```
 docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Acrobeloides buchneri" --outfolder /home/bkhan/Data/Acrobeloides_buchneri --min_length 12000
 ```
 Running mitohifi on the reads
