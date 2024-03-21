@@ -1,7 +1,7 @@
 # Project-Module
 Project Module 2024
 # Commands used during the project.
-The project was to use mitohifi to assemble mitogenome of some nematode species.
+The project was to use mitohifi to assemble and annotate mitochondrial genomes of some nematode species.
 # Plectus Sambesii
 Command to find and download the fasta and genbank file of the closely related species that will be used as a reference.
 ```
