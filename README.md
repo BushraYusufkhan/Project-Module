@@ -81,6 +81,16 @@ Running mitohifi on the reads
 ```
 docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Acrobeloides_buchneri/m54274Ue_230501_185711.hifi_reads.fastq.gz -f /home/bkhan/Data/Acrobeloides_buchneri/MK559448.1.fasta -g /home/bkhan/Data/Acrobeloides_buchneri/MK559448.1.gb -t 12 -o 5
 ```
+###  Acrobeloides_ARO2205
+Command to search and download the reference mitogenome.
+```
+ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Acrobeloides" --outfolder /home/bkhan/Data/Acrobeloides_ARO2205 --min_length 12000
+```
+Running mitohifi on the reads
+```
+ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Acrobeloides_ARO2205/m54274Ue_230531_224848.hifi_reads.fastq.gz -f /home/bkhan/Data/Acrobeloides_ARO2205/MK559448.1.fasta -g  /home/bkhan/Data/Acrobeloides_ARO2205/MK559448.1.gb -t 30 -o 5
+```
+
 ## Could not find mitochondrial genomes
 ###  Anaplectus_granulosus
 Command to find and download the reference mitogenome
