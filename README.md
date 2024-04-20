@@ -121,6 +121,61 @@ Running mitohifi on the contigs data
 docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -c /home/bkhan/Data/Mononchus_laminatus/mlaminatus.flye_v29_default.fasta -f /home/bkhan/Data/Mononchus_laminatus/NC_05639
 1.1.fasta -g /home/bkhan/Data/Mononchus_laminatus/NC_056391.1.gb -t 12 -o 5
 ```
+## Commands used for the phylogenetic tree:
+### Extracting genes from Genbank files
+Below is a python script that you can use to extract genes from Genbank files, make sure to make changes to the script according to your need.
+```
+import os
+from Bio import SeqIO
+
+def extract_features(genbank_file, feature_type):
+    extracted_sequences = []
+    for record in SeqIO.parse(genbank_file, "genbank"):
+        for feature in record.features:
+            if feature.type == feature_type:
+                if 'gene' in feature.qualifiers:
+                    feature_name = feature.qualifiers['gene'][0]
+                elif 'product' in feature.qualifiers:
+                    feature_name = feature.qualifiers['product'][0]
+                else:
+                    feature_name = 'Unknown'
+                extracted_sequences.append((feature.location.extract(record).seq, feature_name, feature_type))
+    return extracted_sequences
+
+def write_sequences_to_fasta(sequences, output_file):
+    with open(output_file, "w") as f:
+        for idx, (seq, feature_name, feature_type) in enumerate(sequences):
+            f.write(f">{feature_type} - {feature_name}\n{seq}\n")
+
+def process_genbank_file(input_file):
+    output_file = os.path.splitext(input_file)[0] + ".genes.fasta"
+    # Extract genes
+    genes = extract_features(input_file, "gene")
+    print(f"Number of genes extracted: {len(genes)}")
+
+    # Extract tRNAs
+    tRNAs = extract_features(input_file, "tRNA")
+    print(f"Number of tRNAs extracted: {len(tRNAs)}")
+
+    # Extract rRNAs
+    rRNAs = extract_features(input_file, "rRNA")
+    print(f"Number of rRNAs extracted: {len(rRNAs)}")
+
+    # Write all sequences to the same output file
+    write_sequences_to_fasta(genes + tRNAs + rRNAs, output_file)
+
+    print(f"All sequences saved to {output_file}")
+
+# Folder containing GenBank files
+folder_path = "/home/bushra/geneextract"
+
+# Iterate through each file in the folder
+for file_name in os.listdir(folder_path):
+    if file_name.endswith(".gb"):
+        genbank_file = os.path.join(folder_path, file_name)
+        print(f"Processing file: {genbank_file}")
+        process_genbank_file(genbank_file)
+```
 
 
 
