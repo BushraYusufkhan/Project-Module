@@ -176,6 +176,32 @@ for file_name in os.listdir(folder_path):
         print(f"Processing file: {genbank_file}")
         process_genbank_file(genbank_file)
 ```
+In some cases you will see that the script has extracted more genes than usual, this is because of the logic of the code, the GenBank files sometimes have slightly different formats, and they have used different identifiers for genes, tRNAs, and rrns. For example, in some cases, the identifier "gene" is used for all of them and sometimes the genes are identified by "gene" and the tRNAs and rRNAs are determined by the identifier "product". So, you can use the script below to delete the duplicates, make sure to specify the input and output folder.
+```
+import os
+from Bio import SeqIO
+
+def keep_unique_sequences(input_folder, output_folder):
+    for file_name in os.listdir(input_folder):
+        if file_name.endswith(".edited.fasta"):
+            input_fasta_file = os.path.join(input_folder, file_name)
+            output_fasta_file = os.path.join(output_folder, file_name.replace(".edited.fasta", ".unique_sequences.fasta"
+))
+            sequences = set()
+
+            with open(output_fasta_file, 'w') as output_fasta:
+                for record in SeqIO.parse(input_fasta_file, 'fasta'):
+                    sequence = str(record.seq)
+                    if sequence not in sequences:
+                        sequences.add(sequence)
+                        SeqIO.write(record, output_fasta, 'fasta')
+
+# Example usage:
+input_folder = "/home/bushra/geneextract/editedfiles"
+output_folder = "/home/bushra/geneextract/uniquesequences"
+keep_unique_sequences(input_folder, output_folder)
+```
+
 ### Extracting genes from gff files
 if you have gff files, you can use this python script to extract the genes, you also need the fasta files for this, make a folder called fastafiles to save your fasta files, it will read the coordinates from the gff files and extract the sequences from the fasta files.
 ```
@@ -247,6 +273,8 @@ def extract_sequences_from_gff(input_gff_file, fasta_file):
 input_folder = "/home/bushra/geneextract/more"
 extract_sequences_from_gff_folder(input_folder)
 ```
+I had two types of file formats Genbank and gff, after extracting the genes at this point, I highly recommend making changes to the heading of the fasta files. Add the organism name, keep the gene name, and ensure the abbreviations used for the genes in all the files are the same. Genbank files and gff files have used different abbreviations for some genes, which can cause problems.  
+Now make a folder with all of the extracted gene files, I hope you have changed the headings.  
 
 
 
