@@ -31,7 +31,7 @@ Running Mitohifi on the raw reads.
 Command to search and download reference mitogenome
 ```
  docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Diploscapter" --outfolder /home/bkhan/Data/Diploscapter_oocerea/incomplete --min_length 1
-2000
+2000 -n 6
 ```
 Running mitohifi on raw sequence data
 ```
@@ -46,7 +46,7 @@ erea/NC_009885.1.fasta -g /home/bkhan/Data/Diploscapter_oocerea/NC_009885.1.gb -
 ### Tripylella_sp
 Command to search and download reference mitogenome
 ```
- docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Tripylella" --outfolder /home/bkhan/Data/Tripylella_sp --min_length 12000
+ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Tripylella" --outfolder /home/bkhan/Data/Tripylella_sp --min_length 12000 -n 6
 ```
 Running mitohifi on the contigs data
 ```
@@ -108,6 +108,10 @@ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mito
 KX017524.1.fasta -g /home/bkhan/Data/Anaplectus_granulosus/KX017524.1.gb -t 12 -o 5
 ```
 ### Mononchus_laminatus
+Command to find and download the reference mitogenome
+```
+docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master findMitoReference.py --species "Mononchus" --outfolder /home/bkhan/Data/Mononchus_laminatus --min_length 12000
+```
 Running mitohifi on the reads
 ```
  docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mitohifi.py -r /home/bkhan/Data/Mononchus_laminatus/m64093_230811_043738.hifi_reads.fastq.gz -f /home/bkhan/Data/Mononchus_laminatus/NC_056391.1.fasta -g /home/bkhan/Data/Mononchus_laminatus/NC_056391.1.gb -t 12 -o 5
