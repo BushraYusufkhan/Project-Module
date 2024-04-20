@@ -176,6 +176,77 @@ for file_name in os.listdir(folder_path):
         print(f"Processing file: {genbank_file}")
         process_genbank_file(genbank_file)
 ```
+### Extracting genes from gff files
+if you have gff files, you can use this python script to extract the genes, you also need the fasta files for this, make a folder called fastafiles to save your fasta files, it will read the coordinates from the gff files and extract the sequences from the fasta files.
+```
+from Bio import SeqIO
+import os
+
+def extract_sequences_from_gff_folder(input_folder):
+    fasta_folder = os.path.join(input_folder, "fastafiles")
+    for file_name in os.listdir(input_folder):
+        if file_name.endswith(".gff"):
+            input_gff_file = os.path.join(input_folder, file_name)
+            fasta_file = os.path.join(fasta_folder, file_name.replace(".gff", ".fasta"))
+            print(f"GFF file: {input_gff_file}")
+            print(f"FASTA file: {fasta_file}")
+            if os.path.exists(fasta_file):
+                extract_sequences_from_gff(input_gff_file, fasta_file)
+            else:
+                print(f"FASTA file {fasta_file} not found.")
+
+def extract_sequences_from_gff(input_gff_file, fasta_file):
+    # Dictionary to store sequences
+    sequences = {}
+
+    # Construct output file name based on input GFF file name
+    output_file = os.path.splitext(input_gff_file)[0] + ".genes.fasta"
+
+    # Open output file in write mode
+    with open(output_file, 'w') as f_out:
+        # Open GFF file
+        with open(input_gff_file, 'r') as gff_file:
+            for line in gff_file:
+                # Skip comment lines
+                if line.startswith('#'):
+                    continue
+                fields = line.split('\t')
+                if len(fields) < 9:
+                    continue
+                seq_id = fields[0]
+                feature_type = fields[2]
+                start = int(fields[3])
+                end = int(fields[4])
+                strand = fields[6]
+                attributes = fields[8]
+
+                # Extracting gene ID from attributes
+                gene_id = ""
+                for attribute in attributes.split(';'):
+                    if attribute.startswith('ID='):
+                        gene_id = attribute.split('=')[1]
+                        break
+
+                # Reading sequence from FASTA file if not already read
+                if seq_id not in sequences:
+                    seq_record = SeqIO.read(fasta_file, "fasta")
+                    sequences[seq_id] = seq_record.seq
+
+                # Extracting sequence based on feature type and coordinates
+                if feature_type in ['gene', 'tRNA', 'rRNA']:
+                    feature_seq = sequences[seq_id][start - 1:end]
+                    # Reverse complement if feature is on the negative strand
+                    if strand == '-':
+                        feature_seq = feature_seq.reverse_complement()
+                    # Write the extracted sequence to the output file with modified header
+                    gene_name = gene_id.split(':')[0]  # Extracting gene name
+                    f_out.write(f">{seq_id}_{gene_name}_{feature_type}\n")
+                    f_out.write(f"{feature_seq}\n")
+
+# Example usage:
+input_folder = "/home/bushra/geneextract/more"
+extract_sequences_from_gff_folder(input_folder)
+```
 
 
 
