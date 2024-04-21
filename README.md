@@ -123,7 +123,7 @@ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mito
 ```
 ## Commands used for the phylogenetic tree:
 ### Extracting genes from Genbank files
-Below is a python script that you can use to extract genes from Genbank files, make sure to make changes to the script according to your need.
+Below is a Python script that you can use to extract genes from Genbank files, make sure to make changes to the script according to your needs. And Biopython should also be installed in your system.
 ```
 import os
 from Bio import SeqIO
@@ -274,7 +274,124 @@ input_folder = "/home/bushra/geneextract/more"
 extract_sequences_from_gff_folder(input_folder)
 ```
 I had two types of file formats Genbank and gff, after extracting the genes at this point, I highly recommend making changes to the heading of the fasta files. Add the organism name, keep the gene name, and ensure the abbreviations used for the genes in all the files are the same. Genbank files and gff files have used different abbreviations for some genes, which can cause problems.  
-Now make a folder with all of the extracted gene files, I hope you have changed the headings.  
+Now make a folder with all of the extracted gene files, I hope you have changed the headings. Now is the time to sort the genes into separate files. 
+Before that, I looked for the most common genes in all of the species and provided the list of those genes in the script below. I do face some issues with this script, it is not perfect, for nad4 it was adding the gene sequences of nad4l too, so I had to delete nad4l sequences from the nad4 file. Also for tRNA-alanine, it caused some problems, it was extracting all of the gene sequences into the tRNA-ala file, which is why I had to make a few changes to this script for tRNA-ala. So, after running this script make sure that all of the the genes are sorted correctly into their respective files. Provide your input and output folder.
+
+```
+import os
+from Bio import SeqIO
+
+# Function to extract gene sequences from fasta files
+def extract_gene_sequences(folder_path, gene_aliases):
+    gene_sequences_dict = {}
+
+    # Iterate through each file in the folder
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".fasta") or filename.endswith(".fa"):
+            file_path = os.path.join(folder_path, filename)
+
+            # Debugging: Print the current file being checked
+            print("Checking file:", file_path)
+
+            # Open fasta file and extract gene sequences
+            with open(file_path, "r") as fasta_file:
+                for record in SeqIO.parse(fasta_file, "fasta"):
+                    # Debugging: Print the current record being checked
+                    print("Checking record:", record.description)
+
+                    for gene_name, aliases in gene_aliases.items():
+                        # Debugging: Print the current gene name being checked
+                        print("Gene Name:", gene_name)
+
+                        for alias_set in aliases:
+                            for alias in alias_set:
+                                if alias.lower() in record.description.lower():
+                                    # Debugging: Print the alias found in the record description
+                                    print("Found alias:", alias)
+
+                                    if gene_name in gene_sequences_dict:
+                                        # Append the sequence to existing list
+                                        gene_sequences_dict[gene_name].append((record.description, str(record.seq)))
+                                    else:
+                                        # Initialize the list with the sequence
+                                        gene_sequences_dict[gene_name] = [(record.description, str(record.seq))]
+
+                                    # Debugging: Print when trnA sequence is found
+                                    if gene_name == "trnA":
+                                        print("Found trnA sequence:", record.description)
+
+                                    break  # Stop searching once the gene is found
+                            else:
+                                continue
+                            break
+
+    return gene_sequences_dict
+
+# Function to save gene sequences to separate files
+def save_gene_sequences(gene_sequences_dict, output_folder):
+    # Create the output directory if it doesn't exist
+    os.makedirs(output_folder, exist_ok=True)
+
+    for gene_name, sequences in gene_sequences_dict.items():
+        # Construct filename
+        output_file = os.path.join(output_folder, f"{gene_name}.fasta")
+        with open(output_file, "w") as output:
+            for description, sequence in sequences:
+                output.write(f">{description}\n{sequence}\n")
+
+# Path to the folder containing fasta files
+folder_path = "/home/bushra/geneextract/uniquesequences"
+
+# Gene names and their aliases to extract
+gene_aliases = {
+    "cox2": [["cox2", "COX2"]],
+    "nad4l": [["nad4l", "ND4L"]],
+    "nad6": [["nad6", "ND6"]],
+    "nad2": [["nad2", "ND2"]],
+    "cox3": [["cox3", "COX3"]],
+    "nad4": [["nad4", "ND4"]],
+    "cob": [["cytb", "CYTB", "cob"]],
+    "atp6": [["atp6", "ATP6"]],
+    "nad5": [["nad5", "ND5"]],
+    "cox1": [["cox1", "COX1"]],
+    "nad3": [["nad3", "ND3"]],
+    "nad1": [["nad1", "ND1"]],
+    "rrnS": [["s-rRNA", "rrnS"]],
+    "rrnL": [["l-rRNA", "rrnL"]],
+    "trnP": [["tRNA-Pro", "trnP"]],
+    "trnY": [["tRNA-Tyr", "trnY"]],
+    "trnQ": [["tRNA-Gln", "trnQ"]],
+    "trnR": [["tRNA-Arg", "trnR"]],
+    "trnI": [["tRNA-Ile", "trnI"]],
+    "trnE": [["tRNA-Glu", "trnE"]],
+    "trnN": [["tRNA-Asn", "trnN"]],
+    "trnT": [["tRNA-Thr", "trnT"]],
+    "trnA": [["tRNA-trnA"], ["tRNA-Ala"]],  # Updated alias for trnA
+    "trnC": [["tRNA-Cys", "trnC"]],
+    "trnV": [["tRNA-Val", "trnV"]],
+    "trnM": [["tRNA-Met", "trnM"]],
+    "trnD": [["tRNA-Asp", "trnD"]],
+    "trnG": [["tRNA-Gly", "trnG"]],
+    "trnF": [["tRNA-Phe", "trnF"]],
+    "trnK": [["tRNA-Lys", "trnK"]],
+    "trnH": [["tRNA-His", "trnH"]],
+    "trnW": [["tRNA-Trp", "trnW"]],
+    "trnL": [["tRNA-Leu", "trnL"]],
+    "trnS": [["tRNA-Ser", "trnS"]]
+}
+
+# Output folder to save extracted gene sequences
+output_folder = "/home/bushra/geneextract/sorted_genes/firstseparate"
+
+# Extract gene sequences
+gene_sequences_dict = extract_gene_sequences(folder_path, gene_aliases)
+
+# Save gene sequences to separate files
+save_gene_sequences(gene_sequences_dict, output_folder)
+
+print("Gene sequences extracted and saved to", output_folder)
+```
+
 
 
 
