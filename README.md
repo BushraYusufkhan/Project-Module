@@ -123,6 +123,7 @@ docker run -u $(id -u) -v $(pwd):$PWD ghcr.io/marcelauliano/mitohifi:master mito
 ```
 ## Commands used for the phylogenetic tree:
 ### Extracting genes from Genbank files
+For phylogenetic tree analysis: the goal was to extract the genes and align each gene separately and then later use for the tree analysis.
 Below is a Python script that you can use to extract genes from Genbank files, make sure to make changes to the script according to your needs. And Biopython should also be installed in your system.
 ```
 import os
@@ -274,7 +275,7 @@ input_folder = "/home/bushra/geneextract/more"
 extract_sequences_from_gff_folder(input_folder)
 ```
 I had two types of file formats Genbank and gff, after extracting the genes at this point, I highly recommend making changes to the heading of the fasta files. Add the organism name, keep the gene name, and ensure the abbreviations used for the genes in all the files are the same. Genbank files and gff files have used different abbreviations for some genes, which can cause problems.  
-Now make a folder with all of the extracted gene files, I hope you have changed the headings. Now is the time to sort the genes into separate files. 
+Now make a folder with all of the extracted gene files, I hope you have changed the headings. Now to sort the genes into separate files. 
 Before that, I looked for the most common genes in all of the species and provided the list of those genes in the script below. I do face some issues with this script, it is not perfect, for nad4 it was adding the gene sequences of nad4l too, so I had to delete nad4l sequences from the nad4 file. Also for tRNA-alanine, it caused some problems, it was extracting all of the gene sequences into the tRNA-ala file, which is why I had to make a few changes to this script for tRNA-ala. So, after running this script make sure that all of the the genes are sorted correctly into their respective files. Provide your input and output folder.
 
 ```
@@ -391,14 +392,99 @@ save_gene_sequences(gene_sequences_dict, output_folder)
 
 print("Gene sequences extracted and saved to", output_folder)
 ```
+Now in some cases, there will be more than one gene for the same protein. For example, in most of the nematode mitochondrial genomes the tRNA-Serine and tRNA-leucine have two genes, they are duplicates but unique genes. This can cause problems for the phylogenetic tree analysis. So, now it is important to know which one of the genes are present more than once and for which species. You can use the script below to find that and then decide whether you want to include them in your final analysis. If an extra gene is present in only one species then you can not align it, so it is better to remove that. I kept the serine-tRNAs and Leucine-tRNAs in my analysis.
+```
+import os
 
+def extract_and_remove_multiple_sequences(input_file, output_file):
+    organisms_sequences = {}
+    organism_counts = {}
 
+    # Read input file and organize sequences by organism
+    with open(input_file, 'r') as f:
+        current_organism = None
+        current_sequence = ''
+        for line in f:
+            line = line.strip()
+            if line.startswith('>'):
+                # Save the previous sequence if it exists
+                if current_organism is not None:
+                    sequences = organisms_sequences.get(current_organism, [])
+                    sequences.append(current_sequence)
+                    organisms_sequences[current_organism] = sequences
+                current_organism = line[1:]
+                current_sequence = ''
+                if current_organism not in organism_counts:
+                    organism_counts[current_organism] = 0
+            else:
+                # Concatenate lines to form the full sequence
+                current_sequence += line
 
+        # Save the last sequence
+        if current_organism is not None:
+            sequences = organisms_sequences.get(current_organism, [])
+            sequences.append(current_sequence)
+            organisms_sequences[current_organism] = sequences
 
+    # Extract and save sequences for organisms with multiple sequences (excluding first occurrence)
+    with open(output_file, 'w') as f_out:
+        for organism, sequences in organisms_sequences.items():
+            if len(sequences) > 1:
+                print(f"Found multiple sequences for organism: {organism}")
+                # Save multiple sequences to the output file
+                for i, seq in enumerate(sequences[1:], start=1):
+                    header = f">{organism}_{i}"
+                    print(f"Writing sequence for {header}: {seq}")
+                    f_out.write(f"{header}\n{seq}\n")
+                # Remove the multiple sequences from the original input file
+                organisms_sequences[organism] = [sequences[0]]
 
+    # Rewrite the original input file without the removed sequences
+    with open(input_file, 'w') as f:
+        for organism, sequences in organisms_sequences.items():
+            for sequence in sequences:
+                f.write(f">{organism}\n{sequence}\n")
 
+def process_folder(input_folder):
+    for root, _, files in os.walk(input_folder):
+        for file in files:
+            if file.endswith(".fasta"):
+                input_file = os.path.join(root, file)
+                output_file = input_file.replace(".fasta", "2.fasta")
+                extract_and_remove_multiple_sequences(input_file, output_file)
+                print(f"Processed: {input_file} -> {output_file}")
 
+# Example usage:
+input_folder = "/home/bushra/geneextract/sorted_genes/finalextractedgenes/test"
+process_folder(input_folder)
+```
+Again these scripts are not perfect manual inspection of the files is required to make sure whether everything is alright or not. If there are no extra genes the output files will be empty, if there are any mostly for serine and leucine those will be saved. You can align them separately and use them in your analysis.
 
+### Command used for alignment using Mafft:
+mafft sequences.fasta > aligned_sequences.fasta
+Replace the input file with your extracted gene files.
+After running mafft I did not trim the alignments because these are gene sequences, while trimming important data might have been lost. 
+### Concatenating the aligned gene files into a supermatrix for phylogenetic analysis
+For concatenating the aligned gene files, now you do not need the gene name in the fasta header just keep the organism name the position of each gene will be present in the partition file that you will use. If you keep the gene name this will affect the concatenation, this will be counted as another taxa rather than a gene for the same taxa (the species name).
+You can use phyx tool or FASconCAT-G. if you use FASconCAT-G, there is also an extra file with all of the important information about the concatenation FcC_info.xls.
+#### phyx
+```
+pxcat -s *.fasta -p output_partition_file -o concatenated_alignment
+```
 
+#### FASconCAT-G
+FASconCAT-G is a perl script, if you are using FASconCAT-G Perl should also be installed in your system. Put this script in the same folder as your aligned file and run.
+```
+perl FASconCAT-G -s -l
+```
+If you want to use the amino acid sequences for your phylogenetic analysis instead of DNA. you can use -e to translate your sequences and then concatenate.
+```
+perl FASconCAT-G -e -s -l
+```
+### Command used to run IQTREE2
+Replace the file names with your concatenated and partition file names. 
+```
+iqtree2 -s concatenated_alignment -spp output_partition_file -m MFP -bb 1000 -nt AUTO
+```
 
 
