@@ -392,7 +392,7 @@ save_gene_sequences(gene_sequences_dict, output_folder)
 
 print("Gene sequences extracted and saved to", output_folder)
 ```
-Now in some cases, there will be more than one gene for the same protein. For example, in most of the nematode mitochondrial genomes the tRNA-Serine and tRNA-leucine have two genes, they are duplicates but unique genes. This can cause problems for the phylogenetic tree analysis. So, now it is important to know which one of the genes are present more than once and for which species. You can use the script below to find that and then decide whether you want to include them in your final analysis. If an extra gene is present in only one species then you can not align it, so it is better to remove that. I kept the serine-tRNAs and Leucine-tRNAs in my analysis.
+Now in some cases, there will be more than one gene for the same protein. For example, in most of the nematode mitochondrial genomes the tRNA-Serine and tRNA-leucine have two genes, they are not duplicates but unique genes. This can cause problems for the phylogenetic tree analysis. So, now it is important to know which one of the genes are present more than once and for which species. You can use the script below to find that and then decide whether you want to include them in your final analysis. If an extra gene is present in only one species then you can not align it, so it is better to remove that. I kept the serine-tRNAs and Leucine-tRNAs in my analysis.
 ```
 import os
 
